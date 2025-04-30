@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Algebra Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6c5ce7;
+      --secondary-color: #a29bfe;
+      --accent-color: #fd79a8;
+      --dark-color: #2d3436;
+      --light-color: #f5f6fa;
+      --success-color: #00b894;
+      --warning-color: #fdcb6e;
+      --error-color: #d63031;
+      --text-color: #2d3436;
+      --text-light: #636e72;
+      --bg-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      color: var(--text-color);
+      background-color: var(--light-color);
+      line-height: 1.7;
+      overflow-x: hidden;
+      position: relative;
+      letter-spacing: 0.3px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin: 25px 0 15px;
+      color: var(--dark-color);
+    }
+
+    .divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 20px 0;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark-color);
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .input-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 35px;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+      background: var(--bg-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      min-height: 100px;
+    }
+
+    .result h3 {
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+
+    .error {
+      color: var(--error-color);
+      font-weight: 500;
+    }
+
+    .operation-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .operation-btn {
+      padding: 10px 15px;
+      border-radius: 6px;
+      background: white;
+      border: 1px solid var(--secondary-color);
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .operation-btn:hover, .operation-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+        margin: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Algebra Calculator</h1>
+    
+    <div class="operation-selector">
+      <button class="operation-btn active" data-operation="simplify">Simplify</button>
+      <button class="operation-btn" data-operation="expand">Expand</button>
+      <button class="operation-btn" data-operation="factor">Factor</button>
+      <button class="operation-btn" data-operation="solve">Solve</button>
+      <button class="operation-btn" data-operation="derive">Derivative</button>
+      <button class="operation-btn" data-operation="integrate">Integral</button>
+    </div>
+    
+    <div class="input-group">
+      <label for="expression">Enter Algebraic Expression:</label>
+      <input type="text" id="expression" placeholder="e.g. x^2 + 2x + 1, 2x+5=13, sin(x)^2 + cos(x)^2">
+    </div>
+    
+    <div class="input-group" id="variable-group" style="display: none;">
+      <label for="variable">With Respect To:</label>
+      <input type="text" id="variable" placeholder="e.g. x" value="x">
+    </div>
+    
+    <button id="calculate" class="btn">CALCULATE</button>
+    
+    <div class="result" id="result">
+      <h3>Result</h3>
+      <p>Your result will appear here</p>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <h2>Examples</h2>
+    <div class="input-group">
+      <p><strong>Simplify:</strong> (x+1)^2 - x^2 - 2x</p>
+      <p><strong>Expand:</strong> (x+2)(x-3)</p>
+      <p><strong>Factor:</strong> x^2 - 4x + 4</p>
+      <p><strong>Solve:</strong> 2x + 5 = 13</p>
+      <p><strong>Derivative:</strong> x^3 + 2x^2</p>
+      <p><strong>Integral:</strong> 3x^2 + 2x</p>
+    </div>
+  </div>
+
+  <script>
+    calculateBtn.addEventListener('click', async function() {
+    const expression = expressionInput.value.trim();
+    
+    if (!expression) {
+        showError('Please enter an expression');
+        return;
+    }
+
+    let endpoint = "";
+    let data = { expression: expression };
+
+    // Based on the selected operation, set the endpoint and adjust the data payload
+    switch (currentOperation) {
+        case 'simplify':
+            endpoint = '/simplify';
+            break;
+        case 'expand':
+            endpoint = '/expand';
+            break;
+        case 'factor':
+            endpoint = '/factor';
+            break;
+        case 'solve':
+            endpoint = '/solve';
+            break;
+        case 'derive':
+            endpoint = '/derivative';
+            data.variable = variableInput.value.trim() || 'x';
+            break;
+        case 'integrate':
+            endpoint = '/integral';
+            data.variable = variableInput.value.trim() || 'x';
+            break;
+    }
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        if (result.error) {
+            showError(result.error);
+        } else {
+            showResult(result.result);
+        }
+    } catch (error) {
+        showError('Something went wrong: ' + error.message);
+    }
+});
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const operationBtns = document.querySelectorAll('.operation-btn');
+      const calculateBtn = document.getElementById('calculate');
+      const expressionInput = document.getElementById('expression');
+      const variableGroup = document.getElementById('variable-group');
+      const variableInput = document.getElementById('variable');
+      const resultDiv = document.getElementById('result');
+      
+      let currentOperation = 'simplify';
+      
+      // Operation selection
+      operationBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          operationBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentOperation = this.dataset.operation;
+          
+          // Show variable input for derivative and integral
+          if (currentOperation === 'derive' || currentOperation === 'integrate') {
+            variableGroup.style.display = 'block';
+          } else {
+            variableGroup.style.display = 'none';
+          }
+          
+          // Update placeholder examples
+          updatePlaceholderExamples();
+        });
+      });
+      
+      // Calculate button click
+      calculateBtn.addEventListener('click', function() {
+        const expression = expressionInput.value.trim();
+        
+        if (!expression) {
+          showError('Please enter an expression');
+          return;
+        }
+        
+        // Process based on operation
+        try {
+          let result;
+          switch(currentOperation) {
+            case 'simplify':
+              result = simplifyExpression(expression);
+              break;
+            case 'expand':
+              result = expandExpression(expression);
+              break;
+            case 'factor':
+              result = factorExpression(expression);
+              break;
+            case 'solve':
+              result = solveEquation(expression);
+              break;
+            case 'derive':
+              const variable = variableInput.value.trim() || 'x';
+              result = findDerivative(expression, variable);
+              break;
+            case 'integrate':
+              const intVariable = variableInput.value.trim() || 'x';
+              result = findIntegral(expression, intVariable);
+              break;
+          }
+          
+          showResult(result);
+        } catch (error) {
+          showError(error.message);
+        }
+      });
+      
+      // Helper functions
+      function updatePlaceholderExamples() {
+        const examples = {
+          'simplify': '(x+1)^2 - x^2 - 2x',
+          'expand': '(x+2)(x-3)',
+          'factor': 'x^2 - 4x + 4',
+          'solve': '2x + 5 = 13',
+          'derive': 'x^3 + 2x^2',
+          'integrate': '3x^2 + 2x'
+        };
+        expressionInput.placeholder = `e.g. ${examples[currentOperation]}`;
+      }
+      
+      function showResult(result) {
+        resultDiv.innerHTML = `
+          <h3>Result</h3>
+          <p><strong>Expression:</strong> ${expressionInput.value}</p>
+          <p><strong>Operation:</strong> ${currentOperation.toUpperCase()}</p>
+          <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 5px;">
+            <p style="font-size: 1.2rem;">${result}</p>
+          </div>
+        `;
+      }
+      
+      function showError(message) {
+        resultDiv.innerHTML = `
+          <h3>Error</h3>
+          <p class="error">${message}</p>
+        `;
+      }
+      
+      // Math processing functions (in a real app, these would call a math engine)
+      function simplifyExpression(expr) {
+        // This is a mock implementation - in reality you'd use a library like math.js
+        return `Simplified: ${expr.replace(/\s+/g, '')}`;
+      }
+      
+      function expandExpression(expr) {
+        // Mock implementation
+        if (expr === '(x+2)(x-3)') return 'x² - x - 6';
+        return `Expanded: ${expr}`;
+      }
+      
+      function factorExpression(expr) {
+        // Mock implementation
+        if (expr === 'x^2 - 4x + 4') return '(x - 2)²';
+        return `Factored: ${expr}`;
+      }
+      
+      function solveEquation(expr) {
+        // Mock implementation
+        if (expr === '2x + 5 = 13') return 'x = 4';
+        return `Solution: ${expr.split('=')[0]} → x = ...`;
+      }
+      
+      function findDerivative(expr, variable) {
+        // Mock implementation
+        if (expr === 'x^3 + 2x^2') return `d/d${variable} = 3x² + 4x`;
+        return `Derivative with respect to ${variable}: ...`;
+      }
+      
+      function findIntegral(expr, variable) {
+        // Mock implementation
+        if (expr === '3x^2 + 2x') return `∫(${expr}) d${variable} = x³ + x² + C`;
+        return `Integral with respect to ${variable}: ...`;
+      }
+      
+      // Initialize
+      updatePlaceholderExamples();
+      expressionInput.focus();
+    });
+  </script>
+</body>
+</html>

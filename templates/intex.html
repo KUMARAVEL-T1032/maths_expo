@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="animate-pop-in">Unlock the Power of <span>Mathematics</span></h1>
+        <p class="animate-pop-in">Explore advanced mathematical tools and visualizations in one powerful platform.</p>
+        <div class="hero-buttons">
+            <a href="/calculator" class="btn btn-primary animate-pop-in">Get Started</a>
+            <a href="#features" class="btn btn-outline animate-pop-in">Learn More</a>
+        </div>
+    </div>
+    <div class="hero-image animate-slide-in">
+        <img src="{{ url_for('static', filename='images/math-bg.svg') }}" alt="Math Illustration">
+    </div>
+</section>
+
+<section class="features" id="features">
+    <h2>Our Mathematical Tools</h2>
+    <div class="features-grid">
+        <div class="feature-card" data-aos="fade-up">
+            <div class="feature-icon">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <h3>Advanced Calculator</h3>
+            <p>Perform complex calculations with trigonometric, logarithmic, and exponential functions.</p>
+            <a href="/calculator" class="btn btn-small">Try It</a>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-icon">
+                <i class="fas fa-th"></i>
+            </div>
+            <h3>Matrix Operations</h3>
+            <p>Compute determinants, inverses, ranks, and transposes of matrices up to 5x5.</p>
+            <a href="/matrix" class="btn btn-small">Try It</a>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-icon">
+                <i class="fas fa-infinity"></i>
+            </div>
+            <h3>Calculus Tools</h3>
+            <p>Calculate derivatives and integrals with step-by-step solutions.</p>
+            <a href="/calculus" class="btn btn-small">Try It</a>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <h3>Graphing</h3>
+            <p>Visualize mathematical functions with our interactive graphing tool.</p>
+            <a href="/graph" class="btn btn-small">Try It</a>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <h3>algebra</h3>
+            <p>Visualize mathematical functions with our interactive graphing tool.</p>
+            <a href="/algebra" class="btn btn-small">Try It</a>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <h3>statisstic</h3>
+            <p>Visualize mathematical functions with our interactive graphing tool.</p>
+            <a href="/statisstic" class="btn btn-small">Try It</a>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const animateElements = document.querySelectorAll('.animate-pop-in');
+        
+        animateElements.forEach((element, index) => {
+            element.style.animation = `popIn 0.8s cubic-bezier(0.26, 0.53, 0.74, 1.48) ${index * 0.2}s forwards`;
+        });
+        
+        document.querySelector('.animate-slide-in').style.animation = 
+            'slideIn 1s cubic-bezier(0.26, 0.53, 0.74, 1.48) 0.5s forwards';
+            
+        // Mobile menu toggle
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const nav = document.querySelector('nav ul');
+        
+        mobileMenu.addEventListener('click', function() {
+            nav.classList.toggle('show');
+        });
+    });
+</script>
+{% endblock %}

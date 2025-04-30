@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Matrix Operations</title>
+
+  <style>
+    /* ===== GLOBAL STYLES ===== */
+    :root {
+      --primary-color: #6c5ce7;
+      --secondary-color: #a29bfe;
+      --accent-color: #fd79a8;
+      --dark-color: #2d3436;
+      --light-color: #f5f6fa;
+      --success-color: #00b894;
+      --warning-color: #fdcb6e;
+      --error-color: #d63031;
+      --text-color: #2d3436;
+      --text-light: #636e72;
+      --bg-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      color: var(--text-color);
+      background-color: var(--light-color);
+      line-height: 1.7;
+      overflow-x: hidden;
+      position: relative;
+      letter-spacing: 0.3px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.3;
+    }
+
+    h1 {
+      font-size: 4rem;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 10px rgba(108, 92, 231, 0.2);
+    }
+
+    h2 {
+      font-size: 2.8rem;
+      margin-bottom: 25px;
+      background: var(--bg-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 35px;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: var(--bg-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+    }
+
+    /* ===== MATRIX SECTION STYLES ===== */
+    .section-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    .section-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .matrix-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .matrix-controls {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .matrix-size-selector, .matrix-operations {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    select, input, button {
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    select {
+      background-color: #fff;
+    }
+
+    .matrix-input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .matrix-input, .result-matrix {
+      display: inline-block;
+      padding: 1rem;
+      background-color: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .matrix-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .matrix-cell {
+      width: 60px;
+      height: 40px;
+      text-align: center;
+      font-size: 1rem;
+      font-family: monospace;
+    }
+
+    .matrix-result {
+      min-height: 100px;
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .error {
+      color: var(--error-color);
+      font-weight: 500;
+    }
+
+    /* Added styles for dual matrix operations */
+    .dual-matrix-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .dual-matrix-input {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dual-matrix-label {
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    .operation-symbol {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 0 0.5rem;
+    }
+
+    .scalar-input {
+      width: 80px;
+      height: 40px;
+      text-align: center;
+      font-size: 1rem;
+      font-family: monospace;
+      margin-top: 1rem;
+    }
+
+    .scalar-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .matrix-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .matrix-size-selector, .matrix-operations {
+        justify-content: space-between;
+      }
+      
+      .matrix-cell {
+        width: 50px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+      
+      .dual-matrix-container {
+        flex-direction: column;
+      }
+      
+      .operation-symbol {
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container matrix-container">
+    <div class="section-header">
+      <h2>Matrix Operations</h2>
+      <p>Select matrix size, operation, and view results!</p>
+    </div>
+
+    <div class="matrix-controls">
+      <div class="matrix-size-selector">
+        <label for="rows">Rows:</label>
+        <select id="rows">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+
+        <label for="cols">Cols:</label>
+        <select id="cols">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+
+        <button id="create-matrix" class="btn btn-primary">Create Matrix</button>
+      </div>
+
+      <div class="matrix-operations">
+        <label for="matrix-operation">Operation:</label>
+        <select id="matrix-operation">
+          <option value="determinant">Determinant</option>
+          <option value="transpose">Transpose</option>
+          <option value="inverse">Inverse</option>
+          <option value="rank">Rank</option>
+          <option value="addition">Addition (A+B)</option>
+          <option value="subtraction">Subtraction (A-B)</option>
+          <option value="multiplication">Multiplication (A×B)</option>
+          <option value="scalar">Scalar Division (A÷c)</option>
+        </select>
+
+        <button id="calculate-matrix" class="btn btn-primary">Calculate</button>
+      </div>
+    </div>
+
+    <div class="matrix-input-container" id="single-matrix-container">
+      <div id="matrix-input" class="matrix-input"></div>
+      <div id="matrix-result" class="matrix-result">
+        <p>Result will appear here</p>
+      </div>
+    </div>
+
+    <div class="dual-matrix-container" id="dual-matrix-container" style="display: none;">
+      <div class="dual-matrix-input">
+        <div class="dual-matrix-label">Matrix A</div>
+        <div id="matrix-input-a" class="matrix-input"></div>
+      </div>
+      
+      <div id="operation-symbol" class="operation-symbol">+</div>
+      
+      <div class="dual-matrix-input">
+        <div class="dual-matrix-label">Matrix B</div>
+        <div id="matrix-input-b" class="matrix-input"></div>
+      </div>
+      
+      <div class="scalar-container" id="scalar-container" style="display: none;">
+        <div class="dual-matrix-label">Scalar value:</div>
+        <input type="number" id="scalar-value" class="scalar-input" value="2" step="any">
+      </div>
+    </div>
+
+    <div class="matrix-result" id="dual-matrix-result" style="display: none; margin-top: 2rem;">
+      <p>Result will appear here</p>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const rowsSelect = document.getElementById('rows');
+      const colsSelect = document.getElementById('cols');
+      const createBtn = document.getElementById('create-matrix');
+      const matrixInput = document.getElementById('matrix-input');
+      const matrixInputA = document.getElementById('matrix-input-a');
+      const matrixInputB = document.getElementById('matrix-input-b');
+      const operationSelect = document.getElementById('matrix-operation');
+      const calculateBtn = document.getElementById('calculate-matrix');
+      const resultDiv = document.getElementById('matrix-result');
+      const dualResultDiv = document.getElementById('dual-matrix-result');
+      const singleMatrixContainer = document.getElementById('single-matrix-container');
+      const dualMatrixContainer = document.getElementById('dual-matrix-container');
+      const operationSymbol = document.getElementById('operation-symbol');
+      const scalarContainer = document.getElementById('scalar-container');
+      const scalarValue = document.getElementById('scalar-value');
+
+      // Handle operation selection
+      operationSelect.addEventListener('change', function() {
+        const operation = this.value;
+        
+        // Handle UI visibility based on operation
+        if (['addition', 'subtraction', 'multiplication', 'scalar'].includes(operation)) {
+          singleMatrixContainer.style.display = 'none';
+          dualMatrixContainer.style.display = 'flex';
+          dualResultDiv.style.display = 'flex';
+          
+          // Show or hide second matrix and scalar input based on operation
+          if (operation === 'scalar') {
+            document.querySelector('.dual-matrix-input:nth-child(3)').style.display = 'none';
+            scalarContainer.style.display = 'flex';
+          } else {
+            document.querySelector('.dual-matrix-input:nth-child(3)').style.display = 'flex';
+            scalarContainer.style.display = 'none';
+          }
+          
+          // Set operation symbol
+          switch(operation) {
+            case 'addition': operationSymbol.textContent = '+'; break;
+            case 'subtraction': operationSymbol.textContent = '-'; break;
+            case 'multiplication': operationSymbol.textContent = '×'; break;
+            case 'scalar': operationSymbol.textContent = '÷'; break;
+          }
+          
+          // Handle matrix dimensions for multiplication
+          if (operation === 'multiplication') {
+            colsSelect.addEventListener('change', updateMatrixBRows);
+            updateMatrixBRows();
+          } else {
+            colsSelect.removeEventListener('change', updateMatrixBRows);
+          }
+          
+          // Create both matrices with current dimensions
+          createMatrixA();
+          createMatrixB();
+        } else {
+          singleMatrixContainer.style.display = 'flex';
+          dualMatrixContainer.style.display = 'none';
+          dualResultDiv.style.display = 'none';
+          
+          // Handle square matrix requirements
+          if (operation === 'determinant' || operation === 'inverse') {
+            const rows = parseInt(rowsSelect.value);
+            colsSelect.value = rows;
+            colsSelect.disabled = true;
+          } else {
+            colsSelect.disabled = false;
+          }
+          
+          // Create single matrix with current dimensions
+          createMatrix();
+        }
+      });
+
+      // Function to ensure matrix B rows match matrix A columns for multiplication
+      function updateMatrixBRows() {
+        if (operationSelect.value === 'multiplication') {
+          // For matrix multiplication, B rows must equal A columns
+          document.getElementById('matrix-input-b').innerHTML = '';
+          createMatrixB();
+        }
+      }
+
+      // Create matrix in the single matrix view
+      function createMatrix() {
+        const rows = parseInt(rowsSelect.value);
+        const cols = parseInt(colsSelect.value);
+        matrixInput.innerHTML = '';
+
+        for (let i = 0; i < rows; i++) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'matrix-row';
+          for (let j = 0; j < cols; j++) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = 'any';
+            input.value = i === j ? '1' : '0';
+            input.className = 'matrix-cell';
+            input.dataset.row = i;
+            input.dataset.col = j;
+            rowDiv.appendChild(input);
+          }
+          matrixInput.appendChild(rowDiv);
+        }
+        resultDiv.innerHTML = '<p>Result will appear here</p>';
+      }
+
+      // Create Matrix A for dual matrix operations
+      function createMatrixA() {
+        const rows = parseInt(rowsSelect.value);
+        const cols = parseInt(colsSelect.value);
+        matrixInputA.innerHTML = '';
+
+        for (let i = 0; i < rows; i++) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'matrix-row';
+          for (let j = 0; j < cols; j++) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = 'any';
+            input.value = i === j ? '1' : '0';
+            input.className = 'matrix-cell';
+            input.dataset.row = i;
+            input.dataset.col = j;
+            rowDiv.appendChild(input);
+          }
+          matrixInputA.appendChild(rowDiv);
+        }
+        dualResultDiv.innerHTML = '<p>Result will appear here</p>';
+      }
+
+      // Create Matrix B for dual matrix operations
+      function createMatrixB() {
+        const operation = operationSelect.value;
+        const rowsA = parseInt(rowsSelect.value);
+        const colsA = parseInt(colsSelect.value);
+        
+        let rowsB, colsB;
+        
+        if (operation === 'multiplication') {
+          // For multiplication: A(m×n) × B(n×p) = C(m×p)
+          // B rows must equal A columns
+          rowsB = colsA;
+          colsB = rowsA; // We're setting B columns equal to A rows for convenience, but it could be any value
+        } else {
+          // For addition and subtraction, dimensions must match
+          rowsB = rowsA;
+          colsB = colsA;
+        }
+        
+        matrixInputB.innerHTML = '';
+
+        for (let i = 0; i < rowsB; i++) {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'matrix-row';
+          for (let j = 0; j < colsB; j++) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = 'any';
+            input.value = i === j ? '1' : '0';
+            input.className = 'matrix-cell';
+            input.dataset.row = i;
+            input.dataset.col = j;
+            rowDiv.appendChild(input);
+          }
+          matrixInputB.appendChild(rowDiv);
+        }
+      }
+
+      // Create matrix button click handler
+      createBtn.addEventListener('click', function() {
+        const operation = operationSelect.value;
+        
+        if (['addition', 'subtraction', 'multiplication', 'scalar'].includes(operation)) {
+          createMatrixA();
+          createMatrixB();
+        } else {
+          createMatrix();
+        }
+      });
+
+      // Calculate operation button click handler
+      calculateBtn.addEventListener('click', function() {
+        const operation = operationSelect.value;
+        
+        // Handle dual matrix operations
+        if (['addition', 'subtraction', 'multiplication', 'scalar'].includes(operation)) {
+          calculateDualOperation(operation);
+          return;
+        }
+        
+        // Handle single matrix operations
+        const rows = parseInt(rowsSelect.value);
+        const cols = parseInt(colsSelect.value);
+
+        if ((operation === 'determinant' || operation === 'inverse') && rows !== cols) {
+          resultDiv.innerHTML = '<p class="error">Matrix must be square</p>';
+          return;
+        }
+
+        const matrix = [];
+        for (let i = 0; i < rows; i++) {
+          const row = [];
+          for (let j = 0; j < cols; j++) {
+            const cell = document.querySelector(`.matrix-cell[data-row="${i}"][data-col="${j}"]`);
+            row.push(parseFloat(cell.value) || 0);
+          }
+          matrix.push(row);
+        }
+
+        try {
+          let result;
+          switch (operation) {
+            case 'determinant':
+              result = calculateDeterminant(matrix);
+              resultDiv.innerHTML = `<p>Determinant: <strong>${parseFloat(result).toFixed(4)}</strong></p>`;
+              break;
+            case 'transpose':
+              result = calculateTranspose(matrix);
+              displayMatrixResult(result, resultDiv);
+              break;
+            case 'inverse':
+              result = calculateInverse(matrix);
+              if (result === null) {
+                resultDiv.innerHTML = '<p class="error">Matrix not invertible (det = 0)</p>';
+              } else {
+                displayMatrixResult(result, resultDiv);
+              }
+              break;
+            case 'rank':
+              result = calculateRank(matrix);
+              resultDiv.innerHTML = `<p>Rank: <strong>${result}</strong></p>`;
+              break;
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+      });
+
+      // Function to handle dual matrix operations
+      function calculateDualOperation(operation) {
+        try {
+          // Get matrix A
+          const rowsA = parseInt(rowsSelect.value);
+          const colsA = parseInt(colsSelect.value);
+          const matrixA = [];
+          
+          for (let i = 0; i < rowsA; i++) {
+            const row = [];
+            for (let j = 0; j < colsA; j++) {
+              const cell = matrixInputA.querySelector(`.matrix-cell[data-row="${i}"][data-col="${j}"]`);
+              row.push(parseFloat(cell.value) || 0);
+            }
+            matrixA.push(row);
+          }
+          
+          let result;
+          
+          // Handle scalar division
+          if (operation === 'scalar') {
+            const scalar = parseFloat(scalarValue.value) || 1;
+            
+            if (Math.abs(scalar) < 1e-10) {
+              dualResultDiv.innerHTML = '<p class="error">Cannot divide by zero</p>';
+              return;
+            }
+            
+            result = calculateScalarDivision(matrixA, scalar);
+            displayMatrixResult(result, dualResultDiv);
+            return;
+          }
+          
+          // Get matrix B dimensions
+          let rowsB, colsB;
+          if (operation === 'multiplication') {
+            rowsB = colsA;
+            colsB = document.querySelectorAll('#matrix-input-b .matrix-row:first-child .matrix-cell').length;
+          } else {
+            rowsB = rowsA;
+            colsB = colsA;
+          }
+          
+          // Get matrix B
+          const matrixB = [];
+          for (let i = 0; i < rowsB; i++) {
+            const row = [];
+            for (let j = 0; j < colsB; j++) {
+              const cell = matrixInputB.querySelector(`.matrix-cell[data-row="${i}"][data-col="${j}"]`);
+              row.push(parseFloat(cell.value) || 0);
+            }
+            matrixB.push(row);
+          }
+          
+          // Verify matrix dimensions for operations
+          if ((operation === 'addition' || operation === 'subtraction') && 
+              (rowsA !== rowsB || colsA !== colsB)) {
+            dualResultDiv.innerHTML = '<p class="error">Matrices must have the same dimensions</p>';
+            return;
+          }
+          
+          if (operation === 'multiplication' && colsA !== rowsB) {
+            dualResultDiv.innerHTML = '<p class="error">Number of columns in A must equal number of rows in B</p>';
+            return;
+          }
+          
+          // Calculate result based on operation
+          switch (operation) {
+            case 'addition':
+              result = calculateMatrixAddition(matrixA, matrixB);
+              break;
+            case 'subtraction':
+              result = calculateMatrixSubtraction(matrixA, matrixB);
+              break;
+            case 'multiplication':
+              result = calculateMatrixMultiplication(matrixA, matrixB);
+              break;
+          }
+          
+          displayMatrixResult(result, dualResultDiv);
+        } catch (error) {
+          dualResultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+      }
+
+      // Display matrix result
+      function displayMatrixResult(matrix, targetElement) {
+        let resultHTML = '<div class="result-matrix">';
+        matrix.forEach(row => {
+          resultHTML += '<div class="matrix-row">';
+          row.forEach(cell => {
+            const value = parseFloat(cell).toFixed(2);
+            const displayValue = parseFloat(value);
+            resultHTML += `<span class="matrix-cell">${displayValue}</span>`;
+          });
+          resultHTML += '</div>';
+        });
+        resultHTML += '</div>';
+        targetElement.innerHTML = resultHTML;
+      }
+
+      // Matrix Addition
+      function calculateMatrixAddition(matrixA, matrixB) {
+        const result = [];
+        for (let i = 0; i < matrixA.length; i++) {
+          const row = [];
+          for (let j = 0; j < matrixA[0].length; j++) {
+            row.push(matrixA[i][j] + matrixB[i][j]);
+          }
+          result.push(row);
+        }
+        return result;
+      }
+
+      // Matrix Subtraction
+      function calculateMatrixSubtraction(matrixA, matrixB) {
+        const result = [];
+        for (let i = 0; i < matrixA.length; i++) {
+          const row = [];
+          for (let j = 0; j < matrixA[0].length; j++) {
+            row.push(matrixA[i][j] - matrixB[i][j]);
+          }
+          result.push(row);
+        }
+        return result;
+      }
+
+      // Matrix Multiplication
+      function calculateMatrixMultiplication(matrixA, matrixB) {
+        const rowsA = matrixA.length;
+        const colsA = matrixA[0].length;
+        const colsB = matrixB[0].length;
+        
+        const result = [];
+        for (let i = 0; i < rowsA; i++) {
+          const row = [];
+          for (let j = 0; j < colsB; j++) {
+            let sum = 0;
+            for (let k = 0; k < colsA; k++) {
+              sum += matrixA[i][k] * matrixB[k][j];
+            }
+            row.push(sum);
+          }
+          result.push(row);
+        }
+        return result;
+      }
+
+      // Scalar Division
+      function calculateScalarDivision(matrix, scalar) {
+        return matrix.map(row => row.map(cell => cell / scalar));
+      }
+
+      // Determinant calculation
+      function calculateDeterminant(matrix) {
+        const n = matrix.length;
+        if (n === 1) return matrix[0][0];
+        if (n === 2) return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+
+        let det = 0;
+        for (let j = 0; j < n; j++) {
+          det += matrix[0][j] * cofactor(matrix, 0, j);
+        }
+        return det;
+      }
+
+      function cofactor(matrix, row, col) {
+        return Math.pow(-1, row + col) * calculateDeterminant(getSubMatrix(matrix, row, col));
+      }
+
+      function getSubMatrix(matrix, row, col) {
+        return matrix.filter((_, i) => i !== row)
+                     .map(r => r.filter((_, j) => j !== col));
+      }
+
+      function calculateTranspose(matrix) {
+        return matrix[0].map((_, i) => matrix.map(row => row[i]));
+      }
+
+      function calculateInverse(matrix) {
+        const det = calculateDeterminant(matrix);
+        if (Math.abs(det) < 1e-10) return null;
+        return matrix[0].map((_, i) => matrix.map((_, j) => cofactor(matrix, j, i) / det));
+      }
+
+      function calculateRank(matrix) {
+        const m = matrix.length, n = matrix[0].length;
+        const mat = matrix.map(row => row.slice());
+        let rank = 0, r = 0;
+        for (let j = 0; j < n && r < m; j++) {
+          let i = r;
+          while (i < m && Math.abs(mat[i][j]) < 1e-10) i++;
+          if (i < m) {
+            [mat[i], mat[r]] = [mat[r], mat[i]];
+            const pivot = mat[r][j];
+            for (let k = j; k < n; k++) mat[r][k] /= pivot;
+            for (let l = 0; l < m; l++) {
+              if (l !== r) {
+                const factor = mat[l][j];
+                for (let k = j; k < n; k++) mat[l][k] -= factor * mat[r][k];
+              }
+            }
+            r++;
+          }
+        }
+        return r;
+      }
+
+      // Auto-create default 3x3
+      rowsSelect.value = '3';
+      colsSelect.value = '3';
+      createBtn.click();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scientific Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      margin: 0;
+    }
+
+    .calculator {
+      background-color: #333;
+      border-radius: 20px;
+      padding: 40px;
+      width: 320px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .display {
+      background-color: #222;
+      color: #fff;
+      font-size: 24px;
+      padding: 15px;
+      text-align: right;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      height: 30px;
+      overflow: hidden;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      background-color: #555;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #777;
+    }
+
+    .function {
+      background-color: #444;
+    }
+
+    .number {
+      background-color: #666;
+    }
+
+    .operator {
+      background-color: #ff9500;
+    }
+
+    .equals {
+      background-color: #ff9500;
+    }
+
+    .clear {
+      background-color: #ff3b30;
+    }
+
+    .delete {
+      background-color: #ff9500;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div id="display" class="display">0</div>
+    <div class="buttons">
+      <!-- First Row -->
+      <button onclick="appendFunction('Math.sin(')" class="function">sin</button>
+      <button onclick="appendFunction('Math.cos(')" class="function">cos</button>
+      <button onclick="appendFunction('Math.tan(')" class="function">tan</button>
+      <button onclick="clearDisplay()" class="clear">AC</button>
+
+      <!-- Second Row -->
+      <button onclick="appendFunction('Math.log10(')" class="function">log</button>
+      <button onclick="appendFunction('Math.log(')" class="function">ln</button>
+      <button onclick="appendFunction('Math.sqrt(')" class="function">√</button>
+      <button onclick="backspace()" class="delete">DEL</button>
+
+      <!-- Third Row -->
+      <button onclick="appendFunction('Math.exp(')" class="function">e^x</button>
+      <button onclick="append('^')" class="function">x^y</button>
+      <button onclick="append('Math.PI')" class="function">π</button>
+      <button onclick="append('/')" class="operator">÷</button>
+
+      <!-- Fourth Row -->
+      <button onclick="append('7')" class="number">7</button>
+      <button onclick="append('8')" class="number">8</button>
+      <button onclick="append('9')" class="number">9</button>
+      <button onclick="append('*')" class="operator">×</button>
+
+      <!-- Fifth Row -->
+      <button onclick="append('4')" class="number">4</button>
+      <button onclick="append('5')" class="number">5</button>
+      <button onclick="append('6')" class="number">6</button>
+      <button onclick="append('-')" class="operator">–</button>
+
+      <!-- Sixth Row -->
+      <button onclick="append('1')" class="number">1</button>
+      <button onclick="append('2')" class="number">2</button>
+      <button onclick="append('3')" class="number">3</button>
+      <button onclick="append('+')" class="operator">+</button>
+
+      <!-- Seventh Row -->
+      <button onclick="append('0')" class="number">0</button>
+      <button onclick="append('.')" class="number">.</button>
+      <button onclick="append('Math.E')" class="function">e</button>
+      <button onclick="calculate()" class="equals">=</button>
+
+      <!-- Eighth Row (added to maintain all original functions) -->
+      <button onclick="appendFunction('Math.asin(')" class="function">asin</button>
+      <button onclick="appendFunction('Math.acos(')" class="function">acos</button>
+      <button onclick="appendFunction('Math.atan(')" class="function">atan</button>
+      <button onclick="append('%')" class="function">%</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+    let currentInput = "0";
+
+    function updateDisplay() {
+      display.textContent = currentInput;
+    }
+
+    function append(value) {
+      if (currentInput === "0" && value !== '.' && !isNaN(value)) {
+        currentInput = value;
+      } else {
+        currentInput += value;
+      }
+      updateDisplay();
+    }
+
+    function appendFunction(func) {
+      if (currentInput === "0") {
+        currentInput = func;
+      } else {
+        currentInput += func;
+      }
+      updateDisplay();
+    }
+
+    function clearDisplay() {
+      currentInput = "0";
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = "0";
+      }
+      updateDisplay();
+    }
+
+    function factorial(n) {
+      if (n < 0) return NaN;
+      if (n === 0 || n === 1) return 1;
+      let result = 1;
+      for (let i = 2; i <= n; i++) {
+        result *= i;
+      }
+      return result;
+    }
+
+    function calculate() {
+      try {
+        // Replace displayed constants and operators
+        let expr = currentInput
+          .replace(/\^/g, '**')
+          .replace(/π/g, 'Math.PI')
+          .replace(/e/g, 'Math.E')
+          .replace(/%/g, '/100*');
+        
+        // Handle factorials if present
+        expr = expr.replace(/(\d+)!/g, (_, n) => factorial(parseInt(n)));
+        
+        // Evaluate the expression
+        const result = eval(expr);
+        
+        // Format the result
+        currentInput = Number.isInteger(result) ? result.toString() : parseFloat(result.toFixed(8)).toString();
+        updateDisplay();
+      } catch (error) {
+        currentInput = "Error";
+        updateDisplay();
+        setTimeout(clearDisplay, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

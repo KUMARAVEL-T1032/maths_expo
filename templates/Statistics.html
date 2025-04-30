@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    :root {
+      --primary-color: #6c5ce7;
+      --secondary-color: #a29bfe;
+      --accent-color: #fd79a8;
+      --dark-color: #2d3436;
+      --light-color: #f5f6fa;
+      --success-color: #00b894;
+      --warning-color: #fdcb6e;
+      --error-color: #d63031;
+      --text-color: #2d3436;
+      --text-light: #636e72;
+      --bg-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa; /* Light grey background similar to the previous code */
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 30px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #333; /* Darker text color for better contrast */
+    }
+
+    .topics {
+        margin-bottom: 20px;
+        background: #e9f7ef; /* Soft green background for topics */
+        padding: 15px;
+        border-left: 5px solid #4e2ecc; /* Green border on left */
+        border-radius: 5px;
+    }
+
+    select {
+        width: 200px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #aaa;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .section {
+        margin-top: 20px;
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #fdfdfd; /* Light background for sections */
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+    }
+
+    button {
+        padding: 10px 15px;
+        margin-right: 10px;
+        background-color: #362ecc; /* Green background for buttons */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #27ae60; /* Darker green on hover */
+    }
+
+    #descriptive-output, #hypothesis-output, #estimation-output, #regression-output {
+        margin-top: 15px;
+        background-color: #f0f8ff; /* Light blue background for output sections */
+        padding: 10px;
+        border-left: 4px solid #2980b9; /* Blue left border */
+        border-radius: 5px;
+    }
+</style>
+<body>
+    <div class="container">
+        <h1>Statistics Calculator</h1>
+
+        <!-- Topics List -->
+        <div class="topics">
+            <h3>Supported Topics:</h3>
+            <ul>
+                <li>✅ Descriptive Statistics (Mean, Median, Mode, Std. Deviation)</li>
+                <li>✅ Inferential Statistics (Hypothesis Testing)</li>
+                <li>✅ Estimation (Confidence Interval)</li>
+                <li>✅ Regression and Correlation</li>
+            </ul>
+        </div>
+
+        <!-- Topic Selection Dropdown -->
+        <label for="topic-select">Choose a topic:</label>
+        <select id="topic-select" onchange="showSelectedTopic()">
+            <option value="descriptive">Descriptive Statistics</option>
+            <option value="hypothesis">Inferential Statistics</option>
+            <option value="estimation">Estimation</option>
+            <option value="regression">Regression and Correlation</option>
+        </select>
+
+        <form id="statistics-form">
+            <!-- Descriptive Statistics Section (set as default) -->
+            <div class="section" id="descriptive-section">
+                <h2>Descriptive Statistics</h2>
+                <label for="data-input">Enter Data (comma-separated):</label>
+                <input type="text" id="data-input" placeholder="e.g., 1, 2, 3, 4, 5">
+                <button type="button" onclick="fillSampleData()">Use Example Data</button>
+                <button type="button" onclick="calculateDescriptive()">Calculate</button>
+                <div id="descriptive-output"></div>
+            </div>
+
+            <!-- Inferential Statistics Section -->
+            <div class="section" id="hypothesis-section" style="display: none;">
+                <h2>Inferential Statistics</h2>
+                <label for="hypothesis">Hypothesis Testing:</label>
+                <input type="text" id="hypothesis" placeholder="Enter hypothesis">
+                <button type="button" onclick="performHypothesisTesting()">Test</button>
+                <div id="hypothesis-output"></div>
+            </div>
+
+            <!-- Estimation Section -->
+            <div class="section" id="estimation-section" style="display: none;">
+                <h2>Estimation</h2>
+                <label for="data-input-est">Enter Data (comma-separated):</label>
+                <input type="text" id="data-input-est" placeholder="e.g., 1, 2, 3, 4, 5">
+                <button type="button" onclick="performEstimation()">Estimate</button>
+                <div id="estimation-output"></div>
+            </div>
+
+            <!-- Regression and Correlation Section -->
+            <div class="section" id="regression-section" style="display: none;">
+                <h2>Regression and Correlation</h2>
+                <label for="x-values">X Values (comma-separated):</label>
+                <input type="text" id="x-values" placeholder="e.g., 1, 2, 3">
+                <label for="y-values">Y Values (comma-separated):</label>
+                <input type="text" id="y-values" placeholder="e.g., 4, 5, 6">
+                <button type="button" onclick="calculateRegression()">Calculate</button>
+                <div id="regression-output"></div>
+            </div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+<script>
+    // Function to fill example data
+    function fillSampleData() {
+        document.getElementById("data-input").value = "5, 7, 3, 8, 10, 2, 6";
+        document.getElementById("descriptive-output").innerHTML = "";
+    }
+
+    // Function to show selected topic section
+    function showSelectedTopic() {
+        const selectedTopic = document.getElementById("topic-select").value;
+
+        // Hide all sections
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => section.style.display = 'none');
+
+        // Show the selected section
+        document.getElementById(`${selectedTopic}-section`).style.display = 'block';
+    }
+
+    // Descriptive Statistics Calculation
+    function calculateDescriptive() {
+        const dataInput = document.getElementById("data-input").value;
+        const data = dataInput.split(',').map(Number).filter(n => !isNaN(n));
+
+        if (data.length === 0) {
+            document.getElementById("descriptive-output").innerText = "Please enter valid numbers.";
+            return;
+        }
+
+        const mean = data.reduce((a, b) => a + b, 0) / data.length;
+
+        const sorted = [...data].sort((a, b) => a - b);
+        const middle = Math.floor(sorted.length / 2);
+        const median = sorted.length % 2 !== 0 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+
+        const counts = {};
+        data.forEach(num => counts[num] = (counts[num] || 0) + 1);
+        const maxFreq = Math.max(...Object.values(counts));
+        const mode = Object.keys(counts).filter(k => counts[k] === maxFreq).join(', ');
+
+        const stdDev = Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / data.length);
+
+        document.getElementById("descriptive-output").innerHTML = `
+            <p><strong>Mean:</strong> ${mean.toFixed(2)}</p>
+            <p><strong>Median:</strong> ${median}</p>
+            <p><strong>Mode:</strong> ${mode}</p>
+            <p><strong>Standard Deviation:</strong> ${stdDev.toFixed(2)}</p>
+        `;
+    }
+
+    // Hypothesis Testing Placeholder Function
+    function performHypothesisTesting() {
+        const hypothesis = document.getElementById("hypothesis").value;
+        document.getElementById("hypothesis-output").innerText = `Hypothesis Testing for: ${hypothesis}`;
+    }
+
+    // Estimation (Confidence Interval) Placeholder Function
+    function performEstimation() {
+        const dataInput = document.getElementById("data-input-est").value;
+        const data = dataInput.split(',').map(Number).filter(n => !isNaN(n));
+
+        if (data.length === 0) {
+            document.getElementById("estimation-output").innerText = "Please enter valid numbers for estimation.";
+            return;
+        }
+
+        const mean = data.reduce((a, b) => a + b, 0) / data.length;
+        const stdDev = Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / data.length);
+        const marginOfError = 1.96 * (stdDev / Math.sqrt(data.length)); // Approx. for 95% confidence
+
+        const lowerLimit = mean - marginOfError;
+        const upperLimit = mean + marginOfError;
+
+        document.getElementById("estimation-output").innerHTML = `
+            <p><strong>Confidence Interval (95%):</strong> [${lowerLimit.toFixed(2)}, ${upperLimit.toFixed(2)}]</p>
+        `;
+    }
+
+    // Regression and Correlation Calculation
+    function calculateRegression() {
+        const xInput = document.getElementById("x-values").value;
+        const yInput = document.getElementById("y-values").value;
+
+        const xValues = xInput.split(',').map(Number).filter(n => !isNaN(n));
+        const yValues = yInput.split(',').map(Number).filter(n => !isNaN(n));
+
+        if (xValues.length !== yValues.length || xValues.length === 0) {
+            document.getElementById("regression-output").innerText = "Please enter valid, equal length X and Y values.";
+            return;
+        }
+
+        const n = xValues.length;
+        const sumX = xValues.reduce((a, b) => a + b, 0);
+        const sumY = yValues.reduce((a, b) => a + b, 0);
+        const sumXY = xValues.reduce((sum, x, i) => sum + x * yValues[i], 0);
+        const sumX2 = xValues.reduce((sum, x) => sum + x * x, 0);
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        document.getElementById("regression-output").innerHTML = `
+            <p><strong>Regression Equation:</strong> y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}</p>
+        `;
+    }
+
+</script>
+</html>

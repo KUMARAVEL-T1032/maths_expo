@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Function Graphing{% endblock %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<section class="graph-section">
+    <div class="section-header">
+        <h2>Function Grapher</h2>
+        <p>Visualize mathematical functions in 2D and 3D</p>
+    </div>
+    
+    <div class="graph-container">
+        <div class="graph-controls">
+            <div class="graph-type-selector">
+                <label for="graph-type">Graph Type:</label>
+                <select id="graph-type" class="graph-select">
+                    <option value="2d">2D Function</option>
+                    <option value="3d">3D Surface</option>
+                    <option value="parametric">Parametric Curve</option>
+                    <option value="polar">Polar Coordinates</option>
+                </select>
+            </div>
+            
+            <div class="function-inputs" id="2d-inputs">
+                <div class="input-group">
+                    <label for="function-2d">y = f(x):</label>
+                    <input type="text" id="function-2d" placeholder="e.g., sin(x)*x^2" value="sin(x)">
+                </div>
+                <div class="range-group">
+                    <div class="input-group">
+                        <label for="x-min">x min:</label>
+                        <input type="number" id="x-min" value="-10" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <label for="x-max">x max:</label>
+                        <input type="number" id="x-max" value="10" step="0.5">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="function-inputs hidden" id="3d-inputs">
+                <div class="input-group">
+                    <label for="function-3d">z = f(x,y):</label>
+                    <input type="text" id="function-3d" placeholder="e.g., sin(sqrt(x^2+y^2))" value="sin(x)+cos(y)">
+                </div>
+                <div class="range-group">
+                    <div class="input-group">
+                        <label for="x-min-3d">x range:</label>
+                        <input type="number" id="x-min-3d" value="-5" step="0.5">
+                        <span>to</span>
+                        <input type="number" id="x-max-3d" value="5" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <label for="y-min-3d">y range:</label>
+                        <input type="number" id="y-min-3d" value="-5" step="0.5">
+                        <span>to</span>
+                        <input type="number" id="y-max-3d" value="5" step="0.5">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="function-inputs hidden" id="parametric-inputs">
+                <div class="input-group">
+                    <label for="x-function">x(t):</label>
+                    <input type="text" id="x-function" placeholder="e.g., sin(t)" value="sin(t)">
+                </div>
+                <div class="input-group">
+                    <label for="y-function">y(t):</label>
+                    <input type="text" id="y-function" placeholder="e.g., cos(t)" value="cos(t)">
+                </div>
+                <div class="input-group">
+                    <label for="t-min">t range:</label>
+                    <input type="number" id="t-min" value="0" step="0.5">
+                    <span>to</span>
+                    <input type="number" id="t-max" value="2*pi" step="0.5">
+                </div>
+            </div>
+            
+            <div class="function-inputs hidden" id="polar-inputs">
+                <div class="input-group">
+                    <label for="r-function">r(θ):</label>
+                    <input type="text" id="r-function" placeholder="e.g., 1+cos(θ)" value="1+cos(θ)">
+                </div>
+                <div class="input-group">
+                    <label for="theta-min">θ range:</label>
+                    <input type="number" id="theta-min" value="0" step="0.1">
+                    <span>to</span>
+                    <input type="number" id="theta-max" value="2*pi" step="0.1">
+                </div>
+            </div>
+            
+            <div class="graph-options">
+                <div class="input-group">
+                    <label for="color-select">Graph Color:</label>
+                    <select id="color-select" class="graph-select">
+                        <option value="#6c5ce7">Purple</option>
+                        <option value="#fd79a8">Pink</option>
+                        <option value="#00b894">Teal</option>
+                        <option value="#e17055">Orange</option>
+                        <option value="#0984e3">Blue</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="grid-toggle">Show Grid:</label>
+                    <input type="checkbox" id="grid-toggle" checked>
+                </div>
+            </div>
+            
+            <button id="plot-btn" class="btn btn-primary">
+                <i class="fas fa-chart-line"></i> Plot Function
+            </button>
+            
+            <button id="add-function" class="btn btn-outline">
+                <i class="fas fa-plus"></i> Add Another Function
+            </button>
+        </div>
+        
+        <div class="graph-display">
+            <div id="graph-2d-container" class="graph-view">
+                <canvas id="graph-2d"></canvas>
+            </div>
+            <div id="graph-3d-container" class="graph-view hidden">
+                <div id="graph-3d"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="saved-graphs">
+        <h3>Saved Graphs</h3>
+        <div class="graph-thumbnails" id="graph-thumbnails">
+            <!-- Thumbnails will be added here -->
+        </div>
+    </div>
+</section>
+
+<div class="example-functions">
+    <h3>Example Functions</h3>
+    <div class="example-grid">
+        <div class="example-card" data-example="sin(x)*exp(-x/5)">
+            <h4>Damped Sine Wave</h4>
+            <p>sin(x)*e^(-x/5)</p>
+        </div>
+        <div class="example-card" data-example="sin(x^2+y^2)">
+            <h4>3D Ripple</h4>
+            <p>sin(x²+y²)</p>
+        </div>
+        <div class="example-card" data-example="[sin(3*t),cos(5*t)]">
+            <h4>Lissajous Curve</h4>
+            <p>x=sin(3t), y=cos(5t)</p>
+        </div>
+        <div class="example-card" data-example="sin(5*θ)">
+            <h4>Polar Rose</h4>
+            <p>r=sin(5θ)</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{{ url_for('static', filename='js/graphing.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2
+    $('.graph-select').select2({
+        minimumResultsForSearch: Infinity,
+        width: '100%'
+    });
+    
+    // Graph type switcher
+    const graphTypeSelect = document.getElementById('graph-type');
+    graphTypeSelect.addEventListener('change', function() {
+        // Hide all input sections
+        document.querySelectorAll('.function-inputs').forEach(el => {
+            el.classList.add('hidden');
+        });
+        
+        // Show selected input section
+        document.getElementById(`${this.value}-inputs`).classList.remove('hidden');
+        
+        // Hide all graph views
+        document.querySelectorAll('.graph-view').forEach(el => {
+            el.classList.add('hidden');
+        });
+        
+        // Show selected graph view
+        document.getElementById(`graph-${this.value}-container`).classList.remove('hidden');
+    });
+    
+    // Example function click handler
+    document.querySelectorAll('.example-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const example = this.dataset.example;
+            const graphType = graphTypeSelect.value;
+            
+            if (graphType === '2d') {
+                document.getElementById('function-2d').value = example;
+            } else if (graphType === '3d') {
+                document.getElementById('function-3d').value = example;
+            } else if (graphType === 'parametric') {
+                const [xFunc, yFunc] = example.replace(/[\[\]]/g, '').split(',');
+                document.getElementById('x-function').value = xFunc.trim();
+                document.getElementById('y-function').value = yFunc.trim();
+            } else if (graphType === 'polar') {
+                document.getElementById('r-function').value = example;
+            }
+            
+            // Trigger plot
+            document.getElementById('plot-btn').click();
+        });
+    });
+    
+    // Initial setup
+    graphTypeSelect.dispatchEvent(new Event('change'));
+});
+</script>
+{% endblock %}
